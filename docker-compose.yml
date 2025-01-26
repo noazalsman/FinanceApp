@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  stocks-svr:
+    build: ./stocks
+    environment:
+      - FLASK_PORT=8000
+      - MONGO_PORT=27017
+      - COLLECTION_NAME=stocks
+      - NINJA_API_KEY=aEP03MDkBSAY/r9mx6uh8w==TuN9HlcA7ljMDaAa
+    ports:
+      - "5001:8000"
+    expose:
+        - "8000"
+    depends_on:
+        - mongo
+    restart: always
+
+  capital-gains-svr:
+    build: ./capital-gains
+    environment:
+      - FLASK_PORT=8080
+    ports:
+      - "5003:8080"
+    expose:
+      - "8080"
+    depends_on:
+      - stocks-svr
+    restart: always
+
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    expose:
+      - "27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: always
+
+volumes:
+  mongo_data:
