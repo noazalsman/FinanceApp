@@ -1,0 +1,35 @@
+name: assignment4
+on: 
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    - name: Build and export stocks
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./stocks/Dockerfile
+        tags: stocks:latest
+        outputs: type=docker, dest=/tmp/stocks-image.tar
+    - name: Build and export capital-gains
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./capital-gains/Dockerfile
+        tags: capital-gains:latest
+        outputs: type=docker, dest=/tmp/capital-gains-image.tar
+    - name: Upload artifact stocks
+      uses: actions/upload-artifact@v4
+      with:
+        name: stocks-image
+        path: /tmp/stocks-image.tar
+    - name: Upload artifact capital-gains
+      uses: actions/upload-artifact@v4
+      with:
+        name: capital-gains-image
+        path: /tmp/capital-gains-image.tar
