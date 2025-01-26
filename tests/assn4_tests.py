@@ -148,7 +148,7 @@ def test_get_deleted_stock_by_id(created_stock_ids):
     assert response.status_code == 404
 
 
-def test_invalid_stock_creation_incorrect_date(stocks_details):
-    response = requests.post(f"{BASE_URL}/stocks", json=stocks_details["stock8"])
+def test_invalid_stock_creation_incorrect_date(stock_details):
+    response = requests.post(f"{BASE_URL}/stocks", json=stock_details["stock8"])
     assert response.status_code == 400
 

@@ -32,6 +32,15 @@ def get_curr_stock_values(id):
     stock_value = stock_current_price * stock["shares"]
     return symbol, round(stock_current_price, 2), round(stock_value, 2)
 
+def is_date_in_format(date_str):
+    try:
+        # Attempt to parse the date string in the specified format
+        datetime.strptime(date_str, "%d-%m-%Y")
+        return True
+    except ValueError:
+        # If parsing fails, the format is incorrect
+        return False
+
 @app.route('/stocks', methods=['POST'])
 def add_stock():
     print("POST stocks")
@@ -41,7 +50,7 @@ def add_stock():
             return jsonify({"error": "Expected application/json media type"}), 415
         data = request.get_json()
         required_fields = ["symbol", "purchase price", "shares"]
-        if not all(field in data for field in required_fields):
+        if not all(field in data for field in required_fields) or not is_date_in_format(data["purchase date"]):
             return jsonify({"error": "Malformed data"}), 400
         stocks_items = list(stocks_collection.find())
         if any(data["symbol"] == stock["symbol"] for stock in stocks_items):
@@ -99,7 +108,7 @@ def del_stock(id):
         stock = stocks_collection.delete_one({"_id": ObjectId(id)})
         if stock is None:
             return jsonify({"error": "Not found"}), 404
-        return '', 204
+        return '', 200
     except Exception as e:
         print("Exception: ", str(e))
         return jsonify({"server error": str(e)}), 500
