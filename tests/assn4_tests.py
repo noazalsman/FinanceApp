@@ -1,13 +1,14 @@
 import pytest
 import requests
 import os
+import json
 
 BASE_URL = "http://localhost:5001"
 
 @pytest.fixture
 def stock_details():
     stock_data = {}
-    stock_dir = "tests/stock-objects"
+    stock_dir = "./stock-objects"
 
     for file in os.listdir(stock_dir):
         if file.endswith(".json"):
