@@ -30,6 +30,7 @@ jobs:
         tags: capital-gains:latest
         outputs: type=docker, dest=/tmp/capital-gains-image.tar
     - name: Log build status
+      if: always()
       run: |
         if [[ -f /tmp/stocks-image.tar && -f /tmp/capital-gains-image.tar ]]; then
           echo "image successfully built" >> log.txt
@@ -83,6 +84,7 @@ jobs:
       - name: Run Docker Compose
         run: docker compose up -d
       - name: Log container status
+        if: always()
         run: |
           if docker ps | grep -q "stocks" && docker ps | grep -q "capital-gains"; then
             echo "Container up and running" >> log.txt
@@ -108,6 +110,7 @@ jobs:
           cd tests
           pytest -v assn4_tests.py > assn4_test_results.txt
       - name: Log test results
+        if: always()
         run: |
           if grep -q "failed" tests/assn4_test_results.txt; then
             echo "tests failed" >> log.txt
