@@ -61,6 +61,8 @@ jobs:
         run: docker image ls
       - name: Run Docker Compose
         run: docker compose up -d
+      - name: Wait for services to start
+        run: sleep 5
       - name: Check containers are running
         run: docker ps
       - name: Set up Python
@@ -107,6 +109,8 @@ jobs:
         run: docker load --input /tmp/capital-gains-image.tar
       - name: Run Docker Compose
         run: docker compose up -d
+      - name: Wait for services to start
+        run: sleep 5
       - name: Check containers are running
         run: docker ps
       - name: Post test stocks data
