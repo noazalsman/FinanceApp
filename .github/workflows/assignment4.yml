@@ -117,6 +117,8 @@ jobs:
           do
             curl -X POST http://localhost:5001/stocks -H "Content-Type: application/json" -d @tests/stock-objects/stock$i.json
           done
+      - name: Debug query.txt contents
+        run: cat query.txt
       - name: Read and execute queries
         run: |
           touch response.txt
