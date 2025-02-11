@@ -5,7 +5,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
+    - name: Checkout repository
       uses: actions/checkout@v4
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -33,3 +33,57 @@ jobs:
       with:
         name: capital-gains-image
         path: /tmp/capital-gains-image.tar
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+    steps:
+      - name: Download stocks image
+        uses: actions/download-artifact@v4
+        with:
+          name: stocks-image
+          path: /tmp/
+      - name: Download capital-gains image
+        uses: actions/download-artifact@v4
+        with:
+          name: capital-gains-image
+          path: /tmp/
+      - name: Verify downloaded artifacts
+        run: ls -l /tmp/
+      - name: Load stocks image
+        run: docker load --input /tmp/stocks-image.tar
+      - name: Load capital-gains image
+        run: docker load --input /tmp/capital-gains-image.tar
+      - name: Check images are loaded
+        run: docker image ls
+      - name: Run Docker Compose
+        run: docker compose up -d
+      - name: Check containers are running
+        run: docker ps
+      - name: Wait for services to start
+        run: sleep 10
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+          pip install requests
+      - name: Check for tests directory
+        run: ls -l
+      - name: Run tests with pytest
+        run: |
+          cd tests
+          pytest -v assn4_tests.py > assn4_test_results.txt
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: assn4_test_results
+          path: tests/assn4_test_results.txt
