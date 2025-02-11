@@ -119,8 +119,6 @@ jobs:
           do
             curl -X POST http://localhost:5001/stocks -H "Content-Type: application/json" -d @tests/stock-objects/stock$i.json
           done
-      - name: Verify curl works
-        run: curl -s "http://localhost:5001/stocks?shares=7"
       - name: Read and execute queries
         run: |
           touch response.txt
@@ -139,7 +137,7 @@ jobs:
 
             echo "query: $line" >> response.txt
             echo "response: $response" >> response.txt
-            echo "" >> response.txt  # Empty line for readability
+            echo "" >> response.txt
 
           done < query.txt
       - name: Upload response.txt

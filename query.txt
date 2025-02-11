@@ -1,1 +1,3 @@
 stocks:shares=7
+capital-gains:numshareslt=13
+stocks:symbol=INTC
