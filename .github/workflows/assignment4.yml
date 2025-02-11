@@ -40,7 +40,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: log-build
+        name: log-only-build-job
         path: log.txt
     - name: Upload artifact stocks
       uses: actions/upload-artifact@v4
@@ -61,7 +61,7 @@ jobs:
       - name: Download log file
         uses: actions/download-artifact@v4
         with:
-          name: log-build
+          name: log-only-build-job
       - name: Download stocks image
         uses: actions/download-artifact@v4
         with:
@@ -124,7 +124,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: log file
+          name: final-log-file
           path: log.txt
   query:
     needs: test
