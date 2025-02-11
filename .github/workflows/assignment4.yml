@@ -15,14 +15,14 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: ./stocks
-        file: Dockerfile
+        file: ./stocks/Dockerfile
         tags: stocks:latest
         outputs: type=docker, dest=/tmp/stocks-image.tar
     - name: Build and export capital-gains
       uses: docker/build-push-action@v5
       with:
         context: ./capital-gains
-        file: Dockerfile
+        file: ./capital-gains/Dockerfile
         tags: capital-gains:latest
         outputs: type=docker, dest=/tmp/capital-gains-image.tar
     - name: Upload artifact stocks
