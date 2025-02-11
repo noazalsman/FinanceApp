@@ -64,7 +64,7 @@ jobs:
       - name: Check containers are running
         run: docker ps
       - name: Wait for services to start
-        run: sleep 10
+        run: sleep 5
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -109,16 +109,18 @@ jobs:
         run: docker load --input /tmp/capital-gains-image.tar
       - name: Run Docker Compose
         run: docker compose up -d
+      - name: Check containers are running
+        run: docker ps
       - name: Wait for services to start
-        run: sleep 10
+        run: sleep 5
       - name: Post test stocks data
         run: |
           for i in {1..6}
           do
             curl -X POST http://localhost:5001/stocks -H "Content-Type: application/json" -d @tests/stock-objects/stock$i.json
           done
-      - name: Check query.txt contents
-        run: cat query.txt
+      - name: Verify inserted stocks
+        run: curl -s http://localhost:5001/stocks
       - name: Read and execute queries
         run: |
           touch response.txt
