@@ -117,25 +117,38 @@ jobs:
           do
             curl -X POST http://localhost:5001/stocks -H "Content-Type: application/json" -d @tests/stock-objects/stock$i.json
           done
-      - name: Debug query.txt contents
+      - name: Check query.txt contents
         run: cat query.txt
       - name: Read and execute queries
         run: |
           touch response.txt
           while IFS= read -r line; do
+            echo "Processing query: $line"  # Debugging log
+
             service=$(echo "$line" | cut -d':' -f1 | xargs)
             query=$(echo "$line" | cut -d':' -f2- | xargs)
+
             if [ "$service" == "stocks" ]; then
-              response=$(curl -s "http://localhost:5001/stocks?$query")
+              url="http://localhost:5001/stocks?$query"
             elif [ "$service" == "capital-gains" ]; then
-              response=$(curl -s "http://localhost:5003/capital-gains?$query")
+              url="http://localhost:5003/capital-gains?$query"
             else
-              response="Invalid service name"
+              echo "Invalid service name in query: $line" >> response.txt
+              continue
             fi
+
+            echo "Querying: $url"  # Debugging log
+            response=$(curl -s "$url")
+
+            # Log empty responses
+            if [ -z "$response" ]; then
+              echo "Warning: No response received for $url" >> response.txt
+            fi
+
             echo "query: $line" >> response.txt
             echo "response: $response" >> response.txt
             echo "" >> response.txt
-          done < query.txt
+            done < query.txt
       - name: Upload response.txt
         uses: actions/upload-artifact@v4
         with:
