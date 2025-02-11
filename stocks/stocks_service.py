@@ -67,7 +67,7 @@ def add_stock():
             "shares": data["shares"]
         }
         response = stocks_collection.insert_one(new_stock)
-        return jsonify({"id": str(response.inserted_id)}), 202
+        return jsonify({"id": str(response.inserted_id)}), 201
     except Exception as e:
         print("Exception: ", str(e))
         return jsonify({"server error": str(e)}), 500
