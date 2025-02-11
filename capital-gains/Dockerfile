@@ -2,7 +2,7 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-COPY capital_gains_service.py .
+COPY capital_gains_service.py ./app/capital_gains_service.py
 
 RUN pip install Flask python-dotenv requests
 
