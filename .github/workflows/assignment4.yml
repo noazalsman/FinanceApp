@@ -119,57 +119,29 @@ jobs:
           do
             curl -X POST http://localhost:5001/stocks -H "Content-Type: application/json" -d @tests/stock-objects/stock$i.json
           done
-      - name: Verify inserted stocks
+      - name: Verify curl works
         run: curl -s "http://localhost:5001/stocks?shares=7"
       - name: Read and execute queries
         run: |
-          touch response.txt  # Ensure the file exists
+          touch response.txt
 
-          echo "=== STARTING QUERY EXECUTION ===" | tee -a response.txt
-
-          while IFS= read -r line; do
-            echo "Processing query: $line" | tee -a response.txt  # Log the query execution
-
+          while IFS= read -r line || [[ -n "$line" ]]; do
             service=$(echo "$line" | cut -d':' -f1 | xargs)
             query=$(echo "$line" | cut -d':' -f2- | xargs)
 
             if [ "$service" == "stocks" ]; then
-              url="http://localhost:5001/stocks?$query"
+              response=$(curl -s "http://localhost:5001/stocks?$query")
             elif [ "$service" == "capital-gains" ]; then
-              url="http://localhost:5003/capital-gains?$query"
+              response=$(curl -s "http://localhost:5003/capital-gains?$query")
             else
-              echo "❌ Invalid service name in query: $line" | tee -a response.txt
-              continue
+              response="Invalid service name"
             fi
 
-            echo "🔍 Querying: $url" | tee -a response.txt  # Log the actual URL being requested
-
-            response=$(curl -s -w "\nHTTP_CODE:%{http_code}" "$url")
-            http_code=$(echo "$response" | grep -o 'HTTP_CODE:[0-9]*' | cut -d':' -f2)
-            json_response=$(echo "$response" | sed '/HTTP_CODE/d')
-
-            echo "🌐 HTTP Response Code: $http_code" | tee -a response.txt
-            echo "📜 Raw Response: $json_response" | tee -a response.txt
-
-            # If HTTP response code is not 200, log the error
-            if [ "$http_code" != "200" ]; then
-              echo "❌ ERROR: Received HTTP $http_code for $url" | tee -a response.txt
-              continue
-            fi
-
-            # If response is empty, log it explicitly
-            if [ -z "$json_response" ]; then
-              echo "⚠️ WARNING: No response received for $url" | tee -a response.txt
-            fi
-
-            # Append formatted output to response.txt
-            echo "query: $line" | tee -a response.txt
-            echo "response: $json_response" | tee -a response.txt
-            echo "" | tee -a response.txt  # Empty line for readability
+            echo "query: $line" >> response.txt
+            echo "response: $response" >> response.txt
+            echo "" >> response.txt  # Empty line for readability
 
           done < query.txt
-
-          echo "=== QUERY EXECUTION COMPLETED ===" | tee -a response.txt
       - name: Upload response.txt
         uses: actions/upload-artifact@v4
         with:
