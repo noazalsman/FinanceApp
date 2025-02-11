@@ -14,10 +14,8 @@ jobs:
     - name: Initialize log file
       run: |
         echo "$(date -Iminutes)" > log.txt
-        echo "Noa Zalsman" >> log.txt 
-        echo "Noa Fuks" >> log.txt
+        echo "Noa Zalsman, Noa Fuks" >> log.txt 
     - name: Build and export stocks
-      id: build_stocks
       uses: docker/build-push-action@v5
       with:
         context: ./stocks
@@ -25,7 +23,6 @@ jobs:
         tags: stocks:latest
         outputs: type=docker, dest=/tmp/stocks-image.tar
     - name: Build and export capital-gains
-      id: build_capital_gains
       uses: docker/build-push-action@v5
       with:
         context: ./capital-gains
@@ -88,12 +85,6 @@ jobs:
           else
             echo "Container failed to run" >> log.txt
           fi
-      - name: Upload log file
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: log
-          path: log.txt
       - name: Wait for services to start
         run: sleep 5
       - name: Check containers are running
