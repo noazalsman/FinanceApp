@@ -54,7 +54,7 @@ def test_get_stock_by_id(created_stock_ids):
 def test_get_all_stocks(stock_details):
     response = requests.get(f"{BASE_URL}/stocks")
     data = response.json()
-    assert len(data) == 2  # Ensure there are 3 stocks
+    assert len(data) == 3  # Ensure there are 3 stocks
     assert response.status_code == 200
 
 
